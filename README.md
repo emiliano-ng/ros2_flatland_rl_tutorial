@@ -157,3 +157,5 @@ por Filipe Almeida, Gonçalo Leão, Armando Sousa (2023).
 ![Screenshot 2](screenshots/SS_2.png)
 ![Screenshot 3](screenshots/SS_3.png)
 ![Screenshot 4](screenshots/SS_4.png)
+![RViz](screenshots/RVIZ.gif)
+![Terminal](screenshots/Terminal.gif)
