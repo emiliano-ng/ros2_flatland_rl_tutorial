@@ -101,3 +101,9 @@ ros2 launch serp_rl serp_rl.launch.py
 - Flatland Simulator
 - Stable-Baselines3
 - Gymnasium
+
+## Evidencia visual
+![Screenshot 1](screenshots/SS_1.png)
+![Screenshot 2](screenshots/SS_2.png)
+![Screenshot 3](screenshots/SS_3.png)
+![Screenshot 4](screenshots/SS_4.png)
