@@ -247,7 +247,7 @@ class SerpControllerEnv(Node, gym.Env):
             self.collision = True
 
     def run_episode(self, agent):
-        cumulative_reward = (old_distance_to_end - self.distance_to_end) * 10
+        cumulative_reward = 0.0
 
         obs, info = self.reset()
         terminated = False
