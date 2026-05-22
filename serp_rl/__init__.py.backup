@@ -15,7 +15,7 @@ from flatland_msgs.msg import Collisions
 import gymnasium as gym
 from gymnasium import spaces
 
-from stable_baselines3 import DQN
+from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 
 
@@ -271,7 +271,7 @@ class SerpControllerEnv(Node, gym.Env):
         check_env(self, warn=True)
 
         # Create agent
-        agent = DQN("MlpPolicy", self, verbose=1, learning_starts=500)
+        agent = PPO("MlpPolicy", self, verbose=1)
 
         min_accuracy = 0.8
         accuracy = 0.0
@@ -304,7 +304,7 @@ class SerpControllerEnv(Node, gym.Env):
             f"Training Finished. Training iterations: {training_iterations}  Accuracy: {accuracy}"
         )
 
-        agent.save("src/ros2_flatland_rl_tutorial/a2c")
+        agent.save("src/ros2_flatland_rl_tutorial/ppo")
 
     def destroy_node(self):
         self.change_robot_speeds(0.0, 0.0)
