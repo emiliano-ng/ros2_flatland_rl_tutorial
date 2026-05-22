@@ -41,7 +41,7 @@ class SerpControllerEnv(Node, gym.Env):
         self.end_range = 0.02
 
         # Number of divisions of the LiDAR
-        self.n_lidar_sections = 9
+        self.n_lidar_sections = 18
         self.lidar_sample = []
 
         # Variables that track a possible end state
@@ -117,6 +117,7 @@ class SerpControllerEnv(Node, gym.Env):
         return self.state, info
 
     def step(self, action):
+        old_distance_to_end = self.distance_to_end
         if isinstance(action, np.ndarray):
             action = int(action.item())
         else:
@@ -144,16 +145,16 @@ class SerpControllerEnv(Node, gym.Env):
             terminated = True
         elif self.distance_to_end < self.end_range:
             end_state = "finished"
-            reward = 400.0 + (200 - self.step_number)
+            reward = 400.0
             terminated = True
         elif self.step_number >= self.max_steps:
             end_state = "timeout"
             reward = -300.0
             truncated = True
         elif action == 0:
-            reward = 2.0
+            reward = (old_distance_to_end - self.distance_to_end) * 10
         else:
-            reward = 0.0
+            reward = (old_distance_to_end - self.distance_to_end) * 10
 
         info = {"end_state": end_state}
 
@@ -246,7 +247,7 @@ class SerpControllerEnv(Node, gym.Env):
             self.collision = True
 
     def run_episode(self, agent):
-        cumulative_reward = 0.0
+        cumulative_reward = (old_distance_to_end - self.distance_to_end) * 10
 
         obs, info = self.reset()
         terminated = False
@@ -270,8 +271,10 @@ class SerpControllerEnv(Node, gym.Env):
         # Check environment compatibility
         check_env(self, warn=True)
 
-        # Create agent
-        agent = DQN("MlpPolicy", self, verbose=1, learning_starts=500)
+        agent = DQN("MlpPolicy", self, verbose=1,
+            learning_starts=1000,
+            buffer_size=50000,
+            exploration_fraction=0.3)
 
         min_accuracy = 0.8
         accuracy = 0.0
@@ -279,7 +282,7 @@ class SerpControllerEnv(Node, gym.Env):
         training_iterations = 0
 
         while accuracy < min_accuracy:
-            training_steps = 5000
+            training_steps = 20000
             self.get_logger().info(f"Starting training for {training_steps} steps")
 
             self.training = True
