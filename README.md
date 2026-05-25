@@ -159,3 +159,35 @@ por Filipe Almeida, Gonçalo Leão, Armando Sousa (2023).
 ![Screenshot 4](screenshots/SS_4.png)
 ![RViz](screenshots/RVIZ.gif)
 ![Terminal](screenshots/Terminal.gif)
+
+## Análisis del entrenamiento observado
+
+### Primera iteración (5,000 steps con A2C)
+Al inicio se probó con A2C, pero se detectó un problema de **colapso de entropía**:
+la `entropy_loss` bajó de `-0.423` a `-0.004` muy rápidamente, lo que indica que
+el agente convergió prematuramente a una política subóptima (solo avanzar y chocar).
+Por esta razón se migró a DQN.
+
+### Entrenamiento con DQN
+
+**Fase de exploración (primeros 500 steps):**
+- `exploration_rate` inició en `0.65` y bajó a `0.05` rápidamente
+- El agente tomaba acciones casi aleatorias para explorar el entorno
+- `ep_rew_mean` comenzó en `-157`, indicando colisiones frecuentes
+
+**Fase de aprendizaje (500 - 5,000 steps):**
+- La recompensa media mejoró progresivamente: `-157 a -128 a -105 a -88`
+- El `loss` bajó de `13.3` a `0.005`, indicando que la red Q convergió
+- Los episodios comenzaron a durar más (`ep_len_mean` estabilizado en ~63 pasos)
+
+**Comportamiento observado:**
+- Las primeras iteraciones el robot solo avanzaba y chocaba contra la pared
+- Con más entrenamiento empezó a intentar girar antes de chocar
+- La función de recompensa basada en distancia (`(old_distance - new_distance) * 10`)
+  fue clave para que el agente aprendiera a acercarse al objetivo
+- Se observaron episodios con `End state: timeout` en lugar de `collision`,
+  indicando que el robot aprendió a evitar colisiones aunque no llegara al objetivo
+
+**Resultado final:**
+El modelo alcanzó una **precisión del 80%** (16/20 episodios exitosos),
+cumpliendo el criterio de parada del entrenamiento.
